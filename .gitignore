@@ -1,0 +1,5 @@
+# private data files
+credentials.py
+endpoints.json
+endpoints.txt
+rdfmts.json
