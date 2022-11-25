@@ -1,12 +1,14 @@
 import requests
-from .credentials import *
-from .functions import *
+from credentials import *
+from functions import *
 import pandas as pd
 from io import StringIO
 print(__package__)
-from os.path import join
+from os.path import join, abspath
 from functools import reduce
 
+import sys
+sys.path.insert(0, abspath('.'))
 
 class SPARQLRequest():
     def __init__(self, url, id_or_user=None, pass_or_secret=None,\
@@ -17,6 +19,7 @@ class SPARQLRequest():
         self.auth_type = auth_type
         self.is_fdq = is_fdq
         self.is_fdq_serive = is_fdq_serive
+        self.auth = None
     
     @auth
     def __set_params(self, accept_type='text/csv', *args, **kwargs):
@@ -66,26 +69,18 @@ class SPARQLRequest():
         # return pd.read_csv(StringIO(str(response.content, 'utf-8')))
         
 
-def main(client_url='', client_id='', client_secret='',
-         query="""SELECT DISTINCT ?s ?o WHERE{?s a ?o.} LIMIT 10"""):
-    
-    cmemc_query = SPARQLRequest(client_url, client_id, client_secret)
-    print(cmemc_query.get_response(query))
-    
-    
-#    fuseki_query = Query(fuseki_endpoint, fuseki_user_infai, fuseki_pw_infai)
-#    print (fuseki_query.get_response(query))
-    
 
 if __name__ == "__main__":
     
     query = """PREFIX  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         SELECT DISTINCT ?s ?o WHERE{?s a ?o.} LIMIT 10"""
-        
-    main(client_url_tib, client_id_tib,
-         client_secret_tib, query)
-    main (client_url_imp, client_id_imp,
-         client_secret_imp, query)
-    main(client_url_infai, client_id_infai,
-         client_secret_infai, query)
+
+    """cmemc_query = SPARQLRequest(client_url_tib_1, client_id_tib_1, client_secret_tib_1, 'oauth')
+    print(cmemc_query.execute(query))
+    print(cmemc_query.response.content)"""
+    
+    
+    fuseki_query = SPARQLRequest(fuseki_endpoint_infai, fuseki_user_infai, fuseki_pw_infai, 'basic')
+    print(fuseki_query.execute(query))
+    print(fuseki_query.response.content)

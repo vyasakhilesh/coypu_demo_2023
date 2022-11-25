@@ -31,7 +31,8 @@ def auth(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if args[0].auth_type =='oauth':
-            url = args[0].url + "/auth/realms/cmem/protocol/openid-connect/token"
+            #url = args[0].url + "/auth/realms/cmem/protocol/openid-connect/token"
+            url = "https://pm.coypu.org/auth/realms/cmem/protocol/openid-connect/token"
             payload = 'grant_type=client_credentials&client_id={}&client_secret={}'\
                 .format(args[0].id_or_user, args[0].pass_or_secret)
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -42,8 +43,8 @@ def auth(func):
         elif args[0].auth_type =='basic':
             usr_pass = args[0].id_or_user + ':' + args[0].pass_or_secret
             args[0].auth =  "Basic {}".format(base64.b64encode(usr_pass.encode()).decode())
-        else:
-            args[0].auth = None
+        if (args[0].auth==None):
+            raise AssertionError('Authorization can not be None, wrong credentials !!')
         return func(*args, **kwargs)
     return wrapper
 
