@@ -5,6 +5,7 @@ import base64
 import time
 import functools
 from os.path import join
+import json
 
 def replace(self, updated_file: str, replace: dict = {'\'': ''},
             header: bool = False, index=False):
@@ -66,4 +67,11 @@ def json_to_csv(json, save_path, filename, columns=None, ret=False):
     df.to_csv(join(save_path, filename+'.csv'), encoding='utf-8', columns=columns, index=False)
     if ret:
         return df[columns]
+    
+@timer
+def dictfrmjson(filename):
+    with open(filename, 'r') as f:
+        d = json.load(f)
+    return dict(d)
+    
 

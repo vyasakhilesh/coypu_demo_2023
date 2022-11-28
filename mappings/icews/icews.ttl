@@ -15,9 +15,8 @@
 @prefix coy: <https://schema.coypu.org/global#> .
 
 :Source
-      #rml:source "/data/20220502-0800-gleif-goldencopy-lei2-golden-copy.csv";
-      # rml:source "/data/20220502-0800-gleif-goldencopy-lei2-golden-copy.csv";
-      rml:source "/data/202201-icews-events_comma.csv";
+      # relative or absolute path w.r.t config file
+      rml:source "../data/202201-icews-events_comma.csv";
 	  rml:referenceFormulation ql:CSV.
 
 :ICEWSEventMap a rr:TriplesMap;

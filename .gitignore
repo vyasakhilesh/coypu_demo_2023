@@ -2,7 +2,8 @@
 credentials.py
 endpoints.json
 endpoints.txt
-rdfmts.json
+endpoints_backup.json
+rdfmts_backup.json
 *.log
 *.out
 
