@@ -6,32 +6,6 @@ from sqlalchemy import create_engine
 from sqlalchemy import engine as eng
 import pandas as pd
 
-class Dataset():
-    """Class for Dataset
-    """
-
-    def __init__(self, name, *args, **kwrgs):
-        self.name = name
-
-    def download(self, *args, **kwargs):
-        pass
-
-    def transform(self, *args, **kwargs):
-        pass
-
-    def get_sample(self, *args, **kwargs):
-        pass
-
-    def fix_error():
-        pass
-
-    def print_sample(self, *args, **kwargs):
-        pass
-    
-    def upload(self, *args, **kwargs):
-        pass
-
-
 class FastArrayProcessing():
     def __init__(self, func, array):
         self.n_workers = 2 * mp.cpu_count()
@@ -106,17 +80,6 @@ class DBCON():
     def get_mysql_con(self):
         return self.dbcon
     
-    
-''' class DFExt(pd.DataFrame):
-    def __init__(self, *args, **kargs):
-        super().__init__(*args, **kargs)
-        
-    def to_db(self, con:DBCON, table_name):
-        self.to_sql(table_name, con=con, index=False, if_exists="fail")
-        
-    def read_db(self, query, con:DBCON):
-        return pd.read_sql(query, con) '''
-
 
 def main():
     pass

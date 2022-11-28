@@ -3,3 +3,13 @@ credentials.py
 endpoints.json
 endpoints.txt
 rdfmts.json
+*.log
+*.out
+
+# ignore
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook
+.ipynb_checkpoints

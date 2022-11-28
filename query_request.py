@@ -13,14 +13,19 @@ sys.path.insert(0, abspath('.'))
 class SPARQLRequest():
     def __init__(self, url, id_or_user=None, pass_or_secret=None,\
                  auth_type:str=None, is_fdq=False, is_fdq_serive=False):
-        self.url = url
-        self.id_or_user = id_or_user
-        self.pass_or_secret = pass_or_secret
-        self.auth_type = auth_type
+        print (any([url, id_or_user, pass_or_secret, auth_type]))
+        if is_fdq == False and not all([url, id_or_user, pass_or_secret, auth_type]):
+            raise AssertionError('Arguments (url, id_or_user, pass_or_secret, auth_type) are None')
+        else:
+            self.url = url
+            self.id_or_user = id_or_user
+            self.pass_or_secret = pass_or_secret
+            self.auth_type = auth_type
+            self.auth = None
+        
         self.is_fdq = is_fdq
         self.is_fdq_serive = is_fdq_serive
-        self.auth = None
-    
+                   
     @auth
     def __set_params(self, accept_type='text/csv', *args, **kwargs):
         if self.auth_type:
@@ -42,7 +47,7 @@ class SPARQLRequest():
         try:
             response = requests.request("POST", self.url, headers=self.headers, data=query, stream=True)
             if response.status_code == 200:
-                print("Passed Query Description: {}".format(response.status_code))
+                print("Passed Query Status: {}".format(response.status_code))
                 self.response = response
             else:
                 print("Failed Query: {}".format(response.content))
@@ -76,11 +81,15 @@ if __name__ == "__main__":
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         SELECT DISTINCT ?s ?o WHERE{?s a ?o.} LIMIT 10"""
 
-    """cmemc_query = SPARQLRequest(client_url_tib_1, client_id_tib_1, client_secret_tib_1, 'oauth')
+    cmemc_query = SPARQLRequest(client_url_imp, client_id_imp, client_secret_imp, 'oauth')
     print(cmemc_query.execute(query))
-    print(cmemc_query.response.content)"""
+    print(cmemc_query.response.content)
     
     
-    fuseki_query = SPARQLRequest(fuseki_endpoint_infai, fuseki_user_infai, fuseki_pw_infai, 'basic')
+    """fuseki_query = SPARQLRequest(fuseki_endpoint_infai, fuseki_user_infai, fuseki_pw_infai, 'basic')
+    print(fuseki_query.execute(query))
+    print(fuseki_query.response.content)"""
+    
+    fuseki_query = SPARQLRequest(skynet_endpoint, skynet_user, skynet_pass, 'basic')
     print(fuseki_query.execute(query))
     print(fuseki_query.response.content)
