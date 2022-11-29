@@ -1,9 +1,9 @@
 # private data files
 credentials.py
-endpoints.json
-endpoints.txt
+endpoints_.json
 endpoints_backup.json
 rdfmts_backup.json
+rdfmts_private.json
 *.log
 *.out
 

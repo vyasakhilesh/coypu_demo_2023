@@ -1,0 +1,8 @@
+{
+    "https://labs.tib.eu/sdm/worldbank_endpoint/sparql": {},
+    "https://implisense.coypu.org/dataplatform/proxy/default/sparql": {
+        "keycloak": "https://implisense.coypu.org/auth/realms/cmem/protocol/openid-connect/token",
+        "username": "tib-federated-engine",
+        "password": "Add your Password here"
+    }
+}
