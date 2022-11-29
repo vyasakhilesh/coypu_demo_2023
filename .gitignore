@@ -7,6 +7,9 @@ rdfmts_backup.json
 *.log
 *.out
 
+# infornore directory
+kgdata/
+
 # ignore
 __pycache__/
 *.py[cod]
