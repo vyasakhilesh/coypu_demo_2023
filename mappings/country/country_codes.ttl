@@ -13,6 +13,7 @@
 @prefix wdt: <http://www.wikidata.org/prop/direct/> .
 @prefix lcc-3166-1: <https://www.omg.org/spec/LCC/Countries/ISO3166-1-CountryCodes/> .
 @prefix coy: <https://schema.coypu.org/global#> .
+@prefix func: <https://mappings.coypu.org/func#> .
 
 
 :Wikidata_DBpedia_MetaDataCountry a rr:TriplesMap;
