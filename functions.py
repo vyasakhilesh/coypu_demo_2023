@@ -44,8 +44,6 @@ def auth(func):
         elif args[0].auth_type =='basic':
             usr_pass = args[0].id_or_user + ':' + args[0].pass_or_secret
             args[0].auth =  "Basic {}".format(base64.b64encode(usr_pass.encode()).decode())
-        if (args[0].auth==None):
-            raise AssertionError('Authorization can not be None, wrong credentials !!')
         return func(*args, **kwargs)
     return wrapper
 
