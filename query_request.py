@@ -7,12 +7,16 @@ print(__package__)
 from os.path import join, abspath
 from functools import reduce
 from urllib.parse import urlencode, quote
+from DeTrusty.Molecule.MTManager import ConfigFile
+from DeTrusty import run_query
+
+
 
 import sys
 sys.path.insert(0, abspath('.'))
 
 class SPARQLRequest():
-    def __init__(self, url, id_or_user=None, pass_or_secret=None,\
+    def __init__(self, url=None, id_or_user=None, pass_or_secret=None,\
                  auth_type:str=None, is_fdq=False, is_fdq_serive=False):
         self.id_or_user = id_or_user
         self.pass_or_secret = pass_or_secret
@@ -43,38 +47,50 @@ class SPARQLRequest():
             self.query='default-graph-uri=&query={}'.format(quote(query))
         
     @timer                    
-    def execute(self, query, accept_type='text/csv'):
-        self.__set_params()
-        self.__set_query(query)
+    def execute(self, query, config=None, join_stars_locally=None):
         # print(self.headers, self.query)
+        self.config = config
         try:
-            response = requests.request("POST", self.url, headers=self.headers, data=self.query, stream=True)
-            if response.status_code == 200:
-                print("Passed Query Status: {}".format(response.status_code))
-                self.response = response
+            if self.is_fdq and config:
+                # print('FDQ')
+                self.response = run_query(query, config=config, join_stars_locally=join_stars_locally)
             else:
-                print("Failed Query: {}".format(response.content))
+                # print('Non-FDQ')
+                self.__set_params()
+                self.__set_query(query)
+                response = requests.request("POST", self.url, headers=self.headers, data=self.query, stream=True)
+                if response.status_code == 200:
+                    print("Passed Query Status: {}".format(response.status_code))
+                    self.response = response
+                else:
+                    print("Failed Query: {}".format(response.content))
         except Exception as e:
             print("Failed Query: {}".format(str(e)))
+    
             
     @timer
     def save(self, save_path, filename:str):
-        filename = '_'.join(filename.split(' '))
-        if self.response.headers['Content-Type']=='text/csv':
-            with open(join(save_path, filename+'.csv'), 'wb') as fd:
-                for chunk in self.response.iter_content(chunk_size=128):
-                    fd.write(chunk)
-        elif self.response.headers['Content-Type']=='application/json':
-            with open(join(save_path, filename+'.json'), 'wb') as fd:
-                for chunk in self.response.iter_content(chunk_size=128):
-                    fd.write(chunk)
-            json_to_csv(self.response.json()['results']['bindings'], save_path, \
-                filename, columns=[var+'.value' for var in self.response.json()['head']['vars']])    
-        else:
-            raise TypeError("Unknown response content-type")
+        try:
+            if self.is_fdq and self.config:
+                json_to_csv(self.response['results']['bindings'], save_path, \
+                    filename, columns=[var+'.value' for var in self.response['head']['vars']])
+            elif self.response.headers['Content-Type']=='text/csv':
+                with open(join(save_path, filename+'.csv'), 'wb') as fd:
+                    for chunk in self.response.iter_content(chunk_size=128):
+                        fd.write(chunk)
+            elif self.response.headers['Content-Type']=='application/json':
+                with open(join(save_path, filename+'.json'), 'wb') as fd:
+                    for chunk in self.response.iter_content(chunk_size=128):
+                        fd.write(chunk)
+                json_to_csv(self.response.json()['results']['bindings'], save_path, \
+                    filename, columns=[var+'.value' for var in self.response.json()['head']['vars']])
+            else:
+                raise TypeError("Unknown response content-type")
+           
+        except Exception as e: 
+            print("Failed Save: {}".format(str(e)))           
         
         del self.response
-        # return pd.read_csv(StringIO(str(response.content, 'utf-8')))
         
 
 

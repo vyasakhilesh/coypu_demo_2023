@@ -30,12 +30,8 @@ SELECT * WHERE{
 }LIMIT 10
 """
 
-query_test = prefixes + """
-SELECT * WHERE{ 
-    ?subject ?predicate ?object
-}
-LIMIT 10
-"""
+
+query_test = """SELECT * WHERE{ ?Subject a ?Concept }LIMIT 1000"""
 
 query_test_public_service = prefixes + prefixes_wiki+"""
 SELECT * WHERE { 
