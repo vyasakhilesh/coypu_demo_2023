@@ -339,7 +339,7 @@ WHERE {
     
     ?annualIndicator wb:hasIndicator <http://worldbank.org/Indicator/SP.DYN.LE00.IN> .
     ?annualIndicator owl:hasValue ?year_exp_WB .
-    ?annualIndicator wb:worldBankDateYear ?year .
+    ?annualIndicator time:year ?year .
 
     ?sameAsCountry p:P2250 ?itemLifeExpectancy .
     ?itemLifeExpectancy ps:P2250 ?year_exp .
