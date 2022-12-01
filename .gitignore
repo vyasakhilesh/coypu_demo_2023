@@ -7,8 +7,9 @@ rdfmts_private.json
 *.log
 *.out
 
-# infornore directory
+# ignore directory
 kgdata/
+query_results/
 
 # ignore
 __pycache__/

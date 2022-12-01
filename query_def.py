@@ -1,10 +1,13 @@
-prefixes = """PREFIX coy: <https://schema.coypu.org/global#>
+prefixes = """
+PREFIX coy: <https://schema.coypu.org/global#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX time: <http://www.w3.org/2006/time#> 
+PREFIX time: <http://www.w3.org/2006/time#>
+"""
 
+prefixes_wb = """
 PREFIX wb: <http://worldbank.org/>
 PREFIX wbi: <http://worldbank.org/Indicator/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
@@ -13,7 +16,8 @@ PREFIX dbo: <http://dbpedia.org/ontology/>
 PREFIX geo: <https://www.geonames.org/ontology#>
 """
 
-prefixes_wiki = """PREFIX wd: <http://www.wikidata.org/entity/>
+prefixes_wiki = """
+PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wds: <http://www.wikidata.org/entity/statement/>
 PREFIX wdv: <http://www.wikidata.org/value/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -21,7 +25,8 @@ PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
-PREFIX bd: <http://www.bigdata.com/rdf#>"""
+PREFIX bd: <http://www.bigdata.com/rdf#>
+"""
 
 query_0_desc = "Query0: Test query"
 query_0 = prefixes + """
@@ -30,8 +35,12 @@ SELECT * WHERE{
 }LIMIT 10
 """
 
-
-query_test = """SELECT * WHERE{ ?Subject a ?Concept }LIMIT 1000"""
+query_test = prefixes + """
+SELECT * WHERE{ 
+    ?subject ?predicate ?object
+}
+LIMIT 10
+"""
 
 query_test_public_service = prefixes + prefixes_wiki+"""
 SELECT * WHERE { 
@@ -121,7 +130,8 @@ limit 2000
 """
 
 query_3_desc = "Query 3: Gdp per captita for countries in different years WB and Wikidata"
-query_3 = prefixes + prefixes_wiki+ """select ?country ?year ?value ?population (?value/?population as ?gdp_per_capita)
+query_3 = prefixes + prefixes_wiki+ """
+select ?country ?year ?value ?population (?value/?population as ?gdp_per_capita)
 where {
 
     SERVICE <https://labs.tib.eu/sdm/worldbank_endpoint/sparql/> {
@@ -227,7 +237,8 @@ WHERE {
 }
 """
 
-query_1_fdq_ex = prefixes+"""SELECT ?country_code ?year ?year_dis ?value ?disaster
+query_1_fdq_ex = prefixes+"""
+SELECT ?country_code ?year ?year_dis ?value ?disaster
 WHERE {
     ?indicator a wb:AnnualIndicatorEntry .
     ?indicator wb:hasIndicator <http://worldbank.org/Indicator/EN.ATM.CO2E.KT> .
@@ -247,6 +258,25 @@ FROM `query_1_fdq_ex`
 WHERE year=year_dis
 GROUP By country_code, year
 Order By  year ASC"""
+
+
+query_1_fdq_ex_1 = prefixes+prefixes_wb+"""
+SELECT ?country_code ?year (AVG(?value) as ?carbon_emission) (COUNT(?disaster) as ?no_of_disasters)
+WHERE {
+    ?indicator a wb:AnnualIndicatorEntry .
+    ?indicator wb:hasIndicator <http://worldbank.org/Indicator/EN.ATM.CO2E.KT> .
+    ?indicator wb:hasCountry ?country .
+    ?indicator owl:hasValue ?value .
+    ?indicator time:year ?year .
+    ?country   dc:identifier ?country_code .
+
+    ?disaster a coy:Disaster .
+    ?disaster time:year ?year .
+    ?disaster geo:countryCode ?country_code .
+}
+GROUP BY ?country_code ?year
+ORDER BY ?year
+"""
 
 
 query_2_fdq_desc="""Q2: For a given country (?country_code), return the life expectancy from World Bank and Wikidata per year for that country.
@@ -272,7 +302,8 @@ query_2_fdq = """SELECT DISTINCT ?date ?year_WB ?year_exp ?year_exp_WB WHERE {
 }
 """
 
-query_2_fdq_ex = prefixes+ prefixes_wiki+ """SELECT DISTINCT ?country_code ?country_name ?year_WB ?date ?year_exp ?year_exp_WB WHERE {
+query_2_fdq_ex = prefixes+ prefixes_wiki+ """
+SELECT DISTINCT ?country_code ?country_name ?year_WB ?date ?year_exp ?year_exp_WB WHERE {
     ?country a wb:Country .
     ?country dc:identifier ?country_code .
     ?country rdfs:label ?country_name.
@@ -295,16 +326,35 @@ FROM `query_2_fdq_ex`
 WHERE YEAR(date)=year_WB
 GROUP BY country_code, country_name, year_WB"""
 
+
+query_2_fdq_ex_1 = prefixes_wb+ prefixes_wiki+ """
+SELECT DISTINCT ?country_code ?country_name ?year (AVG(?year_exp) as ?year_avg_exp_wiki) (AVG(?year_exp_WB) as ?year_avg_exp_WB) 
+WHERE {
+    ?country a wb:Country .
+    ?country dc:identifier ?country_code .
+    ?country rdfs:label ?country_name.
+    ?country dbo:region ?region.
+    ?country owl:sameAs ?sameAsCountry .
+    ?country wb:hasAnnualIndicatorEntry ?annualIndicator .
+    
+    ?annualIndicator wb:hasIndicator <http://worldbank.org/Indicator/SP.DYN.LE00.IN> .
+    ?annualIndicator owl:hasValue ?year_exp_WB .
+    ?annualIndicator wb:worldBankDateYear ?year .
+
+    ?sameAsCountry p:P2250 ?itemLifeExpectancy .
+    ?itemLifeExpectancy ps:P2250 ?year_exp .
+    ?itemLifeExpectancy pq:P585 ?year .
+}
+GROUP BY ?country_code ?country_name ?year
+ORDER BY ?country_code
+"""
+
+
 query_3_fdq_desc="""Q3: For a given country (?c), return the GDP, the population and the GDP per capita per year for that country.
 For example:
 ?c = ‘DEU’
 """
-query_3_fdq = """PREFIX wb: <http://worldbank.org/>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX time: <http://www.w3.org/2006/time#>
-PREFIX p: <http://www.wikidata.org/prop/>
-PREFIX ps: <http://www.wikidata.org/prop/statement/>
-PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+query_3_fdq = """
 SELECT ?year ?value ?population
 WHERE {
     ?indicator a wb:AnnualIndicatorEntry .
@@ -321,12 +371,7 @@ WHERE {
     ?itemP ps:P1082 ?population .
 """
 
-query_3_fdq_ex = prefixes+ prefixes_wiki+ """PREFIX wb: <http://worldbank.org/>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX time: <http://www.w3.org/2006/time#>
-PREFIX p: <http://www.wikidata.org/prop/>
-PREFIX ps: <http://www.wikidata.org/prop/statement/>
-PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+query_3_fdq_ex = prefixes_wb+ prefixes_wiki+ """
 SELECT ?year ?value ?population
 WHERE {
     ?indicator a wb:AnnualIndicatorEntry .
@@ -341,11 +386,31 @@ WHERE {
     ?countryWiki p:P1082 ?itemP .
     ?itemP pq:P585 ?year .
     ?itemP ps:P1082 ?population .
+    }
 """
 
 query_3_fdq_ex_sql = """SELECT isocode, country, YEAR(year) AS year1, (value/population) AS `gdp_per_capita($)`
 FROM `query_3_fdq_ex`
 ORDER BY year1, isocode
+"""
+
+query_3_fdq_ex_1 = prefixes_wb+ prefixes_wiki+ """
+SELECT ?year ?country ?isoCode ((?value/?population) as ?gdp_per_capita)
+WHERE {
+    ?indicator a wb:AnnualIndicatorEntry .
+    ?indicator wb:hasIndicator <http://worldbank.org/Indicator/NY.GDP.MKTP.CD> .
+    ?indicator wb:hasCountry ?country .
+    ?indicator owl:hasValue ?value .
+    ?indicator wb:worldBankDateYear ?year .
+    ?country <http://purl.org/dc/elements/1.1/identifier> 'DEU' .
+
+    ?countryWiki p:P298 ?isoCode .
+    ?isoCode ps:P298 'DEU' .
+    ?countryWiki p:P1082 ?itemP .
+    ?itemP pq:P585 ?year .
+    ?itemP ps:P1082 ?population .
+}
+ORDER BY ?year ?isoCode
 """
 
 
@@ -369,7 +434,8 @@ WHERE {
     ?itemP ps:P1082 ?population .
 }
 """
-query_4_fdq_ex = prefixes+prefixes_wiki+"""SELECT ?timestamp ?time ?fatalities ?population ?iri
+query_4_fdq_ex = prefixes+prefixes_wiki+"""
+SELECT ?timestamp ?time ?fatalities ?population ?iri
 WHERE {
     ?iri a coy:AcledEvent .
     ?iri coy:hasIsoCode 'SYR' .
@@ -389,7 +455,21 @@ WHERE YEAR(timestamp)=year
 GROUP BY year, isocode, country
 """
 
+query_4_fdq_ex_1 = prefixes+prefixes_wiki+"""
+SELECT ?isoCode ?year (COUNT(?iri) AS ?no_of_events) 
+WHERE {
+    ?iri a coy:AcledEvent .
+    ?iri coy:hasIsoCode 'IDN' .
+    ?iri coy:hasTimestamp ?timestamp .
+    ?iri coy:hasFatalities ?fatalities .
+    BIND(year(?timestamp) as ?year)
 
-
-
-
+    ?countryWiki p:P298 ?isoCode .
+    ?isoCode ps:P298 'IDN' .
+    ?countryWiki p:P1082 ?itemP .
+    ?itemP pq:P585 ?time .
+    ?itemP ps:P1082 ?population .
+    BIND(year(?time) as ?year)
+}
+GROUP BY ?year ?isocode
+"""
