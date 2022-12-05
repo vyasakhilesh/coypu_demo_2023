@@ -71,5 +71,30 @@ def dictfrmjson(filename):
     with open(filename, 'r') as f:
         d = json.load(f)
     return dict(d)
+
+def get_public_data_info(name:str, url:str):
+    API_URL = url + "package_list"
+    try:
+        response = requests.get(API_URL)
+    except requests.exceptions.RequestException as e:
+        print("ERROR ACCESSING API: ", API_URL, e.__str__())
+    datasets = response.json().get('result')
+    dataset_list = [id for id in datasets if name in id]
     
+    API_URL = url + "package_show"
+    for id in dataset_list:
+        try:
+            response = requests.get(API_URL, params = {"id": id})
+        except requests.exceptions.RequestException as e:
+            print("ERROR ACCESSING API: ", API_URL, e.__str__())
+        print (id, response.json().get('result'))
+    
+
+def create_dataset(dataset_dict:dict, url:str, user_token):
+    API_URL = url + "package_create"
+    try:
+        response = requests.post(API_URL, data = dataset_dict, headers={'Authorization': user_token})
+    except requests.exceptions.RequestException as e:
+        print("ERROR ACCESSING API: ", API_URL, e.__str__())
+    return response.json()
 

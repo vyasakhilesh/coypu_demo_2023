@@ -14,6 +14,9 @@ PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX dbo: <http://dbpedia.org/ontology/>
 PREFIX geo: <https://www.geonames.org/ontology#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 """
 
 prefixes_wiki = """
@@ -333,7 +336,6 @@ WHERE {
     ?country a wb:Country .
     ?country dc:identifier ?country_code .
     ?country rdfs:label ?country_name.
-    ?country dbo:region ?region.
     ?country owl:sameAs ?sameAsCountry .
     ?country wb:hasAnnualIndicatorEntry ?annualIndicator .
     
@@ -343,7 +345,8 @@ WHERE {
 
     ?sameAsCountry p:P2250 ?itemLifeExpectancy .
     ?itemLifeExpectancy ps:P2250 ?year_exp .
-    ?itemLifeExpectancy pq:P585 ?year .
+    ?itemLifeExpectancy pq:P585 ?time .
+    BIND(year(?time) AS ?year)
 }
 GROUP BY ?country_code ?country_name ?year
 ORDER BY ?country_code
