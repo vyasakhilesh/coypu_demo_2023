@@ -113,5 +113,35 @@ WHERE {
 LIMIT 2
 
 
+Prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+Prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+Prefix owl: <http://www.w3.org/2002/07/owl#> 
+Prefix xsd: <http://www.w3.org/2001/XMLSchema#> 
+Prefix geo: <http://www.opengis.net/ont/geosparql#> 
+Prefix gn: <https://www.geonames.org/ontology#> 
+Prefix wdt: <http://www.wikidata.org/prop/direct/> 
+Prefix coy: <https://schema.coypu.org/global#> 
+Prefix gleif-L1: <https://www.gleif.org/ontology/L1/> 
+Prefix gleif-L2: <https://www.gleif.org/ontology/L2/> 
+Prefix gleif-base: <https://www.gleif.org/ontology/Base/> 
+Prefix gleif-elf: <https://www.gleif.org/ontology/EntityLegalForm/> 
+Prefix gleif-ra: <https://www.gleif.org/ontology/RegistrationAuthority/> 
+Prefix gleif-repex: <https://www.gleif.org/ontology/ReportingException/> 
+
+SELECT ?EventText count(?EventId) as ?Event_Count
+{
+  ?EventId  a coy:SocioPoliticalEvent;
+            coy:hasSourceCountry ?source_country;
+            coy:hasTargetCountry ?target_country;
+            coy:hasDescription ?EventText.
+  ?source_country owl:sameAs <http://data.coypu.org/country/DEU>.
+  ?target_country owl:sameAs <http://data.coypu.org/country/FRA>.
+
+}Group By ?EventText
+Order By Desc(?Event_Count)
+LIMIT 5
+
+https://search.gleif.org/#/search/simpleSearch=
+Country with Active Status No of Employees
 
 
