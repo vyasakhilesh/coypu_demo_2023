@@ -3,3 +3,5 @@ rdfizer
 pandas
 plotly
 matplotlib
+jupyter-dash
+jupyterlab
