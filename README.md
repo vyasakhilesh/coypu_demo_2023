@@ -1,7 +1,9 @@
 # coypu_demo_2023
 
-You need private endpoints credentials for running queries.
-Fill credential info and  rename [credential file][./credentials_sample.py] to `credentials.py`
+Steps to follow:
+* Get private endpoint's credentials
+* Fill credential info in [credential file](./credentials_sample.py) and rename it to `credentials.py`
 
+Install packages and run notebooks in `notebooks` folder
 `pip install -r requirements.txt`
 
